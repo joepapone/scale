@@ -1,1 +1,8 @@
 .vscode/
+core
+libraries
+preproc
+scale.ino.*
+build*
+compile*
+include*
