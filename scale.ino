@@ -22,6 +22,9 @@ void setup() {
    Serial.print("LIBRARY VERSION: ");
    Serial.println(HX711_LIB_VERSION);
    Serial.println();
+
+   // Start scale monitoring via assigned pins
+   scale.begin(dataPin, clockPin);
 }
 
 void loop() {
