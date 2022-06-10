@@ -1,4 +1,4 @@
-// Scale amplifier and encoder
+// Scale amplifier and encoder (HX711)
 #include "HX711.h"
 
 // Initialize scale library
@@ -39,3 +39,8 @@ void get_weight() {
   Serial.print(" kg");  
   Serial.println();
 }
+
+/*float get_raw() {
+  for(int i=0; i<20; i++) raw =+ scale.get_units(), 20;
+  return raw/10;
+}*/
