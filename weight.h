@@ -8,14 +8,20 @@ uint8_t dataPin = A1; // DT
 uint8_t clockPin = A0; // CLK
 
 // Scale calibration
-float y1 = 20;
-float y0 = 0;
-float x1 = -300000;
-float x0 = -117000;
-float cal = (y1-y0)/(x1-x0);
-float offset = -12.78;
-float raw;
-float weight;
+struct Calibration {
+  float x0;
+  float x1;
+  float y0;
+  float y1;
+  float slope;  
+  float bias;
+};
+
+// Scale measured values
+struct Values {
+  float raw;
+  float weight;
+};
 
 void weight_config() {
   Serial.print("HX711 LIBRARY VERSION: ");
@@ -26,21 +32,59 @@ void weight_config() {
   scale.begin(dataPin, clockPin);
 }
 
-void get_weight() {
-  for(int i=0; i<10; i++) raw =+ scale.get_units(), 10; // Get 10 raw measurements
-  raw / 10; // Get average raw valve by dividing by 10
-  weight = raw*cal + offset; // Calculate weight
+Calibration get_calibration() {
+  Calibration cal;
+  cal.x0 = -300000;
+  cal.x1 = -117000;
+  cal.y0 = 0;
+  cal.y1 = 20;
+  cal.slope = (cal.y1-cal.y0)/(cal.x1-cal.x0);
+  cal.bias = -12.78;
 
-  Serial.print("Raw: "); 
-  Serial.print(raw);
-  Serial.println();
-  Serial.print("Weight: "); 
-  Serial.print(weight);
-  Serial.print(" kg");  
-  Serial.println();
+  return cal;
 }
 
-/*float get_raw() {
-  for(int i=0; i<20; i++) raw =+ scale.get_units(), 20;
-  return raw/10;
+float get_raw() {
+  float raw;
+  // Get 10 raw values
+  for(int i=0; i<10; i++) raw =+ scale.get_units(), 10;
+  return raw/10; // Return raw value average
+}
+
+Values get_weight() {
+  Calibration cal = get_calibration();
+  Values value;
+  // Get raw value
+  value.raw = get_raw();
+  // Calculate weight
+  value.weight = value.raw*cal.slope + cal.bias;
+  // View result
+  Serial.print("Raw: "); 
+  Serial.print(value.raw);
+  Serial.println();
+  Serial.print("Weight: "); 
+  Serial.print(value.weight);
+  Serial.print(" kg");  
+  Serial.println();
+
+  return value;
+}
+
+/*void get_weight() {
+  Calibration cal = load_calibration();
+  Values value;
+
+  // Get raw measurement
+  for(int i=0; i<10; i++) value.raw =+ scale.get_units(), 10;
+  value.raw = get_raw();
+  // Calculate weight
+  value.weight = value.raw*cal.slope + cal.bias;
+  // View result
+  Serial.print("Raw: "); 
+  Serial.print(value.raw);
+  Serial.println();
+  Serial.print("Weight: "); 
+  Serial.print(value.weight);
+  Serial.print(" kg");  
+  Serial.println();
 }*/

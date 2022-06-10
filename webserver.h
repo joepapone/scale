@@ -1,7 +1,7 @@
 // Internet conectivity
 #include <Ethernet.h>
 #include <SPI.h>
-//#include "weight.h"
+#include "weight.h"
 
 // Assign a MAC address for the Ethernet controller.
 byte mac[] = {
@@ -42,13 +42,15 @@ void webserver_config() {
    Serial.println(Ethernet.localIP());
 
    // Initialize weight measurement
-   //weight_config();
+   weight_config();
 
    // Relay config
    pinMode(LED_BUILTIN, OUTPUT);
 }
 
-void http_get (EthernetClient client, float raw, float weight) {
+void http_get (EthernetClient client) {
+   // Get measurement data
+   Values value = get_weight();
    // Send standard http response header
    client.println("HTTP/1.1 200 OK\r\n" 
                   "Content-Type: text/html\r\n"
@@ -67,10 +69,10 @@ void http_get (EthernetClient client, float raw, float weight) {
    // Send data
    client.print("<h1 style='border-bottom: 3px solid red;'>Scale:</>"); 
    client.print("<h2 style='color:#2F4F4F;' id='raw'>Raw: "); 
-   client.print(raw);
+   client.print(value.raw);
    client.print("</h2>");
    client.print("<h2 style='color:#2F4F4F;' id='weight'>Weight: "); 
-   client.print(weight);
+   client.print(value.weight);
    client.print(" kg</h2>");
    // Calibration form
    client.print("<form action='' method='post' enctype=text/plain' name='config'>"
@@ -105,19 +107,19 @@ void http_post(EthernetClient client) {
       Serial.println("Data received:");
       Serial.println(str);
       Serial.print("Zero calibration = ");
-      //Serial.println(get_raw());
+      Serial.println(get_raw());
    }
    else if (String(str).indexOf("cal=span") != -1) {
       Serial.println("Data received:");
       Serial.println(str);
       Serial.print("Span calibration = ");
-      //Serial.println(get_raw());
+      Serial.println(get_raw());
    }
    else if (String(str).indexOf("cal=offset") != -1) {
       Serial.println("Data received:");
       Serial.println(str);
       Serial.print("Offset calibration = ");
-      //Serial.println(get_raw());
+      Serial.println(get_raw());
    }
    // Gate control
    else if (String(str).indexOf("gate=close") != -1) {
@@ -125,6 +127,7 @@ void http_post(EthernetClient client) {
       Serial.println(str);
       Serial.println("Close gate");
       digitalWrite(LED_BUILTIN, LOW);
+      delay(2000);
       Serial.println(digitalRead(LED_BUILTIN));
    }
    else if(String(str).indexOf("gate=open") != -1) {
@@ -132,11 +135,12 @@ void http_post(EthernetClient client) {
       Serial.println(str);
       Serial.println("Open gate");
       digitalWrite(LED_BUILTIN, HIGH);
+      delay(2000);
       Serial.println(digitalRead(LED_BUILTIN));
    }
 }
 
-void send(float raw, float weight) {
+void webserver() {
    // Listen for incoming clients
    EthernetClient client = server.available();
    if (client) {
@@ -151,7 +155,7 @@ void send(float raw, float weight) {
             // Check if http request has ended, with new line character and blank line.
             if (c == '\n' && currentLineIsBlank) {
                // Send http GET response.
-               http_get(client, raw, weight);
+               http_get(client);
                // Read http POST data.
                http_post(client);
                break;
