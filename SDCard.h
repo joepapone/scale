@@ -11,9 +11,9 @@
 // SD Card conectivity
 #include <SD.h>
 
+#define RFID_SS_PIN 8
+#define ETH_SS_PIN 7
 #define SD_SS_PIN 4
-#define RFID_SS_PIN 7
-#define ETH_SS_PIN 8
 
 // SD card file
 File file;

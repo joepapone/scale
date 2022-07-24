@@ -10,8 +10,8 @@
 
 #include <MFRC522.h>
 
-#define RFID_SS_PIN 7
 #define RST_PIN     9
+#define RFID_SS_PIN 8
 #define RELAY_PIN   2
 
 MFRC522 rfid(RFID_SS_PIN, RST_PIN);

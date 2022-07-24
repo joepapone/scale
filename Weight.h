@@ -13,7 +13,7 @@
 
 // HX711 circuit wiring
 const int LOADCELL_DOUT_PIN = A1; // DT
-const int LOADCELL_SCK_PIN = A0; // SCK
+const int LOADCELL_SCK_PIN = A0;  // SCK
 
 // Initialize scale library
 HX711 scale;

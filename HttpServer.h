@@ -11,7 +11,7 @@
 // Internet conectivity
 #include <Ethernet.h>
 
-#define ETH_SS_PIN 8
+#define ETH_SS_PIN 7
 #define RELAY_PIN 2
 
 // Assign a MAC address for the Ethernet controller.
